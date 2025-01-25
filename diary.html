@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Devulus Diary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .diary-container {
+            width: 600px;
+            height: 800px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .front-page, .diary-page {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+        .front-page {
+            background: linear-gradient(135deg, #fff3b0, #ffd700, #ffeb3b);
+        }
+        .navigation-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .diary-textarea {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            padding: 15px;
+            resize: none;
+            font-size: 16px;
+        }
+        .diary-date {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .date-input {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="diary-container">
+        <div id="front-page" class="front-page">
+            <h1>Devulus Diary</h1>
+            <p>Your personal journey, day by day</p>
+            <input type="date" id="date-selector" class="date-input" min="2024-01-01" max="2024-12-31">
+            <button onclick="goToDate()" class="navigation-btn">Go to Date</button>
+            <button onclick="startDiary()" class="navigation-btn">Begin Your Diary</button>
+        </div>
+        <div id="diary-page" style="display:none;" class="diary-page">
+            <div id="date-display" class="diary-date">January 1, 2024</div>
+            <textarea id="diary-entry" class="diary-textarea" placeholder="Start writing your diary entry..."></textarea>
+            <div>
+                <button onclick="returnToFrontPage()" class="navigation-btn">Front Page</button>
+                <button onclick="previousPage()" class="navigation-btn">Previous</button>
+                <button onclick="nextPage()" class="navigation-btn">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const months = [
+            'January', 'February', 'March', 'April', 
+            'May', 'June', 'July', 'August', 
+            'September', 'October', 'November', 'December'
+        ];
+        
+        let currentDate = new Date(2024, 0, 1);
+        const frontPage = document.getElementById('front-page');
+        const diaryPage = document.getElementById('diary-page');
+        const dateDisplay = document.getElementById('date-display');
+        const diaryEntry = document.getElementById('diary-entry');
+        const dateSelector = document.getElementById('date-selector');
+        const entries = {};
+
+        function startDiary() {
+            frontPage.style.display = 'none';
+            diaryPage.style.display = 'flex';
+        }
+
+        function goToDate() {
+            const selectedDate = new Date(dateSelector.value);
+            if (selectedDate >= new Date('2024-01-01') && selectedDate <= new Date('2024-12-31')) {
+                currentDate = selectedDate;
+                updateDateDisplay();
+                loadEntry();
+                frontPage.style.display = 'none';
+                diaryPage.style.display = 'flex';
+            } else {
+                alert('Please select a date in 2024');
+            }
+        }
+
+        function returnToFrontPage() {
+            saveEntry();
+            diaryPage.style.display = 'none';
+            frontPage.style.display = 'flex';
+        }
+
+        function updateDateDisplay() {
+            dateDisplay.textContent = `${months[currentDate.getMonth()]} ${currentDate.getDate()}, ${currentDate.getFullYear()}`;
+            dateSelector.value = currentDate.toISOString().split('T')[0];
+        }
+
+        function saveEntry() {
+            const dateKey = currentDate.toISOString().split('T')[0];
+            entries[dateKey] = diaryEntry.value;
+        }
+
+        function loadEntry() {
+            const dateKey = currentDate.toISOString().split('T')[0];
+            diaryEntry.value = entries[dateKey] || '';
+        }
+
+        function nextPage() {
+            saveEntry();
+            currentDate.setDate(currentDate.getDate() + 1);
+            
+            if (currentDate.getMonth() === 11 && currentDate.getDate() === 32) {
+                currentDate = new Date(2024, 0, 1);
+            }
+            
+            updateDateDisplay();
+            loadEntry();
+        }
+
+        function previousPage() {
+            saveEntry();
+            currentDate.setDate(currentDate.getDate() - 1);
+            
+            if (currentDate.getMonth() === 0 && currentDate.getDate() === 0) {
+                currentDate = new Date(2024, 11, 31);
+            }
+            
+            updateDateDisplay();
+            loadEntry();
+        }
+
+        updateDateDisplay();
+    </script>
+</body>
+</html>
